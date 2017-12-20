@@ -140,11 +140,12 @@ $(function () {
       $('.app-sidebar__lists li').removeClass('active');
       $this.addClass('active');
       toggleConversationActiveClass();
-      if($this.data('room-type') == 'single'){
-        QiscusSDK.core.UI.chatTarget($this.data('room-name'));
-      } else {
-        QiscusSDK.core.UI.chatGroup($this.data('id'));
-      }
+      // if($this.data('room-type') == 'single'){
+      //   QiscusSDK.core.UI.chatTarget($this.data('room-name'));
+      // } else {
+      //   QiscusSDK.core.UI.chatGroup($this.data('id'));
+      // }
+      QiscusSDK.core.UI.chatGroup($this.data('id'));
       $('#empty-chat-wrapper').addClass('hidden');
       var roomId = $this.attr('data-id');
       clearUnreadMessages(roomId);
