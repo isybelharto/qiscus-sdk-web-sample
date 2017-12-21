@@ -16,6 +16,7 @@ $(function () {
     userData = JSON.parse(userData);
   }
   attachClickListenerOnConversation();
+  loadContactList();
   // let's setup options for our widget
   QiscusSDK.core.init({
     AppId: window.SDK_APP_ID,
@@ -34,8 +35,9 @@ $(function () {
         // Display UI in sidebar
         renderSidebarHeader();
       },
-      newMessagesCallback: function () {
+      newMessagesCallback: function (messages) {
         loadRoomList();
+        patchUnreadMessages(messages);
       },
       groupRoomCreatedCallback: function (data) {
         // Success creating group,
@@ -55,10 +57,15 @@ $(function () {
         $('#empty-chat-wrapper').addClass('hidden');
       },
       chatRoomCreatedCallback: function (data) {
-        console.log('chatRoomCreated', data);
-        var room = createRoomDOM(data.room);
-        appSidebar.find('ul').prepend(room);
-        $('.app-sidebar.chat-stranger').addClass('hidden');
+        // check if room already exists on sidebar
+        var roomId = data.room.id;
+        var isExists = $('#room-' + roomId).length > 0;
+        if (!isExists) {
+          var room = createRoomDOM(data.room);
+          appSidebar.find('ul').prepend(room);
+        }
+        $chatStrangerSidebar.addClass('hidden');
+        $chatStrangerSidebar.find('input[type="text"]').val('');
         $('#empty-chat-wrapper').addClass('hidden');
       }
     }
@@ -68,6 +75,47 @@ $(function () {
   // render the widget
   QiscusSDK.render();
 
+  function clearUnreadMessages (roomId) {
+    var $targetRoomDOM = $('li#room-' + roomId + '');
+    $targetRoomDOM.attr('data-sdk-unread-count', '0');
+    $targetRoomDOM.find('.unread-count')
+      .text('0')
+    $targetRoomDOM.find('.unread-count')
+      .addClass('hidden');
+  }
+  function patchUnreadMessages (messages) {
+    var unreadMessages = messages.filter(function (message) {
+      return message.email !== QiscusSDK.core.email;
+    });
+    unreadMessages.forEach(function (message) {
+      var roomId = message.room_id;
+      var $targetRoomDOM = $('li#room-' + roomId + '');
+      var lastMessageId = $targetRoomDOM.attr('data-sdk-last-message-id') || 0;
+      var lastUnreadCount = $targetRoomDOM.attr('data-sdk-unread-count') || 0;
+      if (lastMessageId < message.id) {
+        $targetRoomDOM
+          .attr('data-sdk-last-message-id', message.id)
+          .find('.last-message')
+          .text(message.message);
+      }
+      $targetRoomDOM.attr('data-sdk-unread-count');
+    });
+    $('.room-item')
+      .filter(function () {
+        var unreadCount = $(this).attr('data-sdk-unread-count');
+        return Number(unreadCount) > 0;
+      })
+      .toArray()
+      .forEach(function (item) {
+        var $this = $(item);
+        var unreadCount = $this.attr('data-sdk-unread-count');
+        // patch unread badge
+        unreadCount = unreadCount > 9 ? '9+' : unreadCount;
+        $this.find('.unread')
+          .removeClass('hidden')
+          .text(unreadCount);
+      });
+  }
 
   function loadRoomList() {
     QiscusSDK.core.loadRoomList()
@@ -92,8 +140,15 @@ $(function () {
       $('.app-sidebar__lists li').removeClass('active');
       $this.addClass('active');
       toggleConversationActiveClass();
+      // if($this.data('room-type') == 'single'){
+      //   QiscusSDK.core.UI.chatTarget($this.data('room-name'));
+      // } else {
+      //   QiscusSDK.core.UI.chatGroup($this.data('id'));
+      // }
       QiscusSDK.core.UI.chatGroup($this.data('id'));
       $('#empty-chat-wrapper').addClass('hidden');
+      var roomId = $this.attr('data-id');
+      clearUnreadMessages(roomId);
     })
   }
 
@@ -113,15 +168,27 @@ $(function () {
     li.setAttribute('data-id', room.id);
     li.setAttribute('id', 'room-' + room.id);
     li.setAttribute('data-room-name', room.name);
+    li.setAttribute('data-room-type', room.room_type);
+    li.setAttribute('data-sdk-last-message-id', '-1');
+    li.setAttribute('data-sdk-unread-count', '0');
+    li.classList.add('room-item');
     var detail = document.createElement('div');
     var name = document.createElement('strong');
     name.innerText = room.name;
     var lastComment = document.createElement('span');
+    lastComment.classList.add('last-comment');
     lastComment.innerText = room.last_comment_message;
     detail.appendChild(name);
     detail.appendChild(lastComment);
+    var unreadCount = document.createElement('span');
+    unreadCount.classList.add('unread-count');
+    unreadCount.innerText = room.count_notif;
+    if (room.count_notif <= 0) {
+      unreadCount.classList.add('hidden');
+    }
     li.appendChild(avatar);
     li.appendChild(detail);
+    li.appendChild(unreadCount);
     return li;
   }
 
@@ -138,7 +205,7 @@ $(function () {
               return item;
             })
             .filter(function (item) {
-              var contactName = $(item).attr('data-user-email');
+              var contactName = $(item).attr('data-user-name');
               return contactName.toLowerCase().indexOf(value) < 0;
             })
             .forEach(function (item) {
@@ -237,21 +304,22 @@ $(function () {
   });
 
   // Load contact
-  $.ajax({
-        url: 'http://dashboard-sample.herokuapp.com/api/contacts',
-        method: 'get'
-      })
-      .done(function (data) {
-        var contacts = data.results.users
-            .filter(function (user) {
-              return user.email !== QiscusSDK.core.email;
-            });
-        var contactDOM = contacts.map(createContactDOM);
-        $('ul.contact-list').empty().append(contactDOM);
-      })
-      .fail(function (error) {
-        console.error('error when fetching contact list', error);
-      });
+  function loadContactList () {
+    var url = window.SDK_DASHBOARD_URL + '/api/contacts?show_all=true';
+    $.ajax({
+      url: url,
+      method: 'get'
+    }).done(function (data) {
+      var contacts = data.results.users
+          .filter(function (user) {
+            return user.email !== QiscusSDK.core.email;
+          });
+      var contactDOM = contacts.map(createContactDOM);
+      $('ul.contact-list').empty().append(contactDOM);
+    }).fail(function (error) {
+      console.error('error when fetching contact list', error);
+    })
+  }
 
   function createContactDOM(contactData) {
     var container = document.createElement('li');

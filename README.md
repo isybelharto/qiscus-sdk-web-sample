@@ -35,4 +35,4 @@ $ npm install http-server -g
 $ cd qiscus-sdk-web-sample
 $ http-server
 ```
-If you want your sample app running with your own APP ID, you can change it in file vars.js which is located at assets/js/vars.js.
+If you want your Sample App and Sample Dashboard running with your own APP ID, you can change the APP ID and add Sample Dashborad URL in file vars.js which is located at assets/js/vars.js 

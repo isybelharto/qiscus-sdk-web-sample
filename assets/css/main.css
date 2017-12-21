@@ -111,6 +111,7 @@ body:before {
   max-width: 125px;
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .app-sidebar__myinfo span {
@@ -922,4 +923,22 @@ ul.contact-list .contact-item-detail span.online-status {
 }
 .app-sidebar.create-group-name .group-name-input::-webkit-input-placeholder {
   text-align: center;
+}
+
+.app-sidebar.main .room-item {
+  justify-content: center;
+  align-items: center;
+}
+.app-sidebar.main .room-item div {
+  flex-grow: 1;
+}
+.app-sidebar.main .unread-count {
+  flex-grow: 0;
+  height: 16px;
+  width: 16px;
+  background: #FFE699;
+  color: #2C2C36;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 11px;
 }
