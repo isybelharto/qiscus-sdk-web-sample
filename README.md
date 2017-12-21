@@ -36,3 +36,4 @@ $ cd qiscus-sdk-web-sample
 $ http-server
 ```
 If you want your Sample App and Sample Dashboard running with your own APP ID, you can change the APP ID and add Sample Dashborad URL in file vars.js which is located at assets/js/vars.js 
+Direct to [Sample Dashboard](https://github.com/qiscus/dashboard-sample) to learn more how to use Sample App with your own Dashboard.
