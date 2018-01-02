@@ -227,6 +227,8 @@ body:before {
   height: 15px;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 170px;
+  white-space: nowrap;
 }
 
 
