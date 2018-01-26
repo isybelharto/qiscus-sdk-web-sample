@@ -944,3 +944,91 @@ ul.contact-list .contact-item-detail span.online-status {
   text-align: center;
   font-size: 11px;
 }
+
+/* Custom message related styling */
+.custom-message--hi {
+  text-align: center;
+  padding: 10px;
+  background: transparent;
+  color: #333;
+  width: 150px;
+  margin: 5px auto;
+}
+.custom-message--hi .fa.fa-hand-paper-o {
+  font-size: 26pt;
+  transform: rotate(-40deg) scaleX(-1);
+}
+#shopping-button {
+  font-size: 12pt;
+  position: absolute;
+  bottom: 4px;
+  right: 144px;
+  background: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 10px;
+}
+#shopping-button:hover {
+  background: #4db6ac;
+  color: white;
+}
+#shopping-button .fa.fa-hand-paper-o {
+  transform: rotate(-40deg) scaleX(-1);
+}
+
+.custom-message--card {
+  width: 50%;
+  background: white;
+  box-shadow: 0 0 3px rgba(0,0,0,.2);
+  border-radius: 4px;
+  margin: 2px;
+  padding: 10px;
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+.custom-message--card .card-title {
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid rgba(0,0,0,.2);
+}
+.custom-message--card .card-detail {
+  flex-grow: 1;
+  display: flex;
+}
+.custom-message--card .card-image {
+  width: 80px;
+  height: 80px;
+  background: lightgrey;
+  border-radius: 4px;
+  object-fit: cover;
+  margin: 2px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+.custom-message--card .card-description {
+  flex-grow: 1;
+  margin-left: 5px;
+  text-align: justify;
+  line-height: 1.3;
+}
+.custom-message--card .card-price {
+  text-align: right;
+  color: grey;
+}
+.custom-message--card .card-small-footer {
+  display: flex;
+  justify-content: space-between;
+}
+.custom-message--card .card-id {
+  color: grey;
+}
+.custom-message--card .card-purchase-button {
+  background:white;
+  border:none;
+  border-top:1px solid rgba(0,0,0,.2);
+  cursor:pointer;
+  padding: 10px;
+}

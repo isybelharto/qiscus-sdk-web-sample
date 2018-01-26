@@ -17,10 +17,109 @@ $(function () {
   }
   attachClickListenerOnConversation();
   loadContactList();
+
+
+ // Custom message related
+ $('#shopping-button').on('click', function () {
+   submitCardMessage();
+   return false;
+ });
+  window.submitHiComment = function submitHiComment (text) {
+    if (!QiscusSDK.core.selected) {
+      return alert('Please open a conversation first');
+    }
+    var activeRoomId = QiscusSDK.core.selected.id;
+    var uniqueId = (new Date()).getTime();
+    var messageText = 'Greetings!';
+    var messageType = 'custom';
+    var messagePayload = {
+      type: 'custom-hi',
+      content: text || 'Greetings!'
+    };
+
+    messagePayload = JSON.stringify(messagePayload);
+    QiscusSDK.core.submitComment(
+      activeRoomId,
+      messageText,
+      uniqueId,
+      messageType,
+      messagePayload
+    );
+  };
+  window.purchaseCard = function purchaseCard (cardId) {
+    alert('You have successfully purchase card with ID: ' + cardId);
+  }
+  window.submitCardMessage = function submitCardComment () {
+    if (!QiscusSDK.core.selected) {
+      return alert('Please open a conversation first');
+    }
+    var activeRoomId = QiscusSDK.core.selected.id;
+    var today = new Date();
+    var uniqueId = today.getTime();
+    var messageText = 'Card';
+    var messageType = 'custom';
+    var messagePayload = {
+      type: 'custom-card',
+      content: messageText || 'Card example',
+      cardPayload: {
+        id: today.getTime(),
+        time: fecha.format(today, 'mediumDate'),
+        itemName: 'Cat for Sale!',
+        pictureURL: 'http://lorempixel.com/80/80/cats/',
+        itemPrice: 'Rp. 1.200.111,-',
+        itemDescription: 'Beautiful cat for sell, get your self a purfect fur!'
+      }
+    }
+    messagePayload = JSON.stringify(messagePayload);
+    QiscusSDK.core.submitComment(
+      activeRoomId,
+      messageText,
+      uniqueId,
+      messageType,
+      messagePayload
+    );
+  }
+  $('body').on('click', '.card-purchase-button', function (event) {
+    var cardId = $(this).data('card-id');
+    alert('You successfully bought cat with item ID:' + cardId);
+    return false;
+  });
+  var customMessageCardTemplate = `
+    <div class="custom-message--card">
+      <h4 class="card-title">
+        {cardPayload.itemName}
+      </h4>
+      <div class="card-detail">
+        <img class="card-image"
+          src="{cardPayload.pictureURL}">
+        <p class="card-description">
+          {cardPayload.itemDescription}
+        </p>
+      </div>
+      <div class="card-small-footer">
+        <span class="card-id">
+          #{cardPayload.id}
+        </span>
+        <span class="card-price">
+          {cardPayload.itemPrice}
+        </span>
+      </div>
+      <button class="card-purchase-button"
+        data-card-id={cardPayload.id}>
+        Purrchase now!
+      </button>
+    </div>
+  `;
+  var customMessagesTemplate = {
+    'custom-hi': '<div class="custom-message--hi"><i class="fa fa-hand-paper-o"></i> {content}</div>',
+    'custom-card': customMessageCardTemplate
+  };
+
   // let's setup options for our widget
   QiscusSDK.core.init({
     AppId: window.SDK_APP_ID,
     mode: 'wide',
+    customTemplates: customMessagesTemplate,
     options: {
       // When we're success login into qiscus SDK we'll have a 1-on-1 chat to guest2@qiscus.com
       // You can change this to any user you have on your AppId, e.g: contact@your_company.com, etc
@@ -478,4 +577,5 @@ $(function () {
         $mainSidebar.removeClass('hidden');
         return false;
       });
+
 });
