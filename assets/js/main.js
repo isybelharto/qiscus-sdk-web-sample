@@ -20,6 +20,10 @@ $(function () {
 
 
  // Custom message related
+ $('#send-wave-button').on('click', function () {
+   submitHiComment();
+   return false;
+ });
  $('#shopping-button').on('click', function () {
    submitCardMessage();
    return false;

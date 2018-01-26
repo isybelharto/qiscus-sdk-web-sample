@@ -958,11 +958,12 @@ ul.contact-list .contact-item-detail span.online-status {
   font-size: 26pt;
   transform: rotate(-40deg) scaleX(-1);
 }
-#shopping-button {
+#shopping-button,
+#send-wave-button {
   font-size: 12pt;
   position: absolute;
   bottom: 4px;
-  right: 144px;
+  left: 35px;
   background: none;
   outline: none;
   border: none;
@@ -970,11 +971,16 @@ ul.contact-list .contact-item-detail span.online-status {
   border-radius: 50%;
   padding: 10px;
 }
-#shopping-button:hover {
+#shopping-button {
+  right: auto;
+  left: 0px;
+}
+#shopping-button:hover,
+#send-wave-button:hover {
   background: #4db6ac;
   color: white;
 }
-#shopping-button .fa.fa-hand-paper-o {
+#send-wave-button .fa.fa-hand-paper-o {
   transform: rotate(-40deg) scaleX(-1);
 }
 
