@@ -21,10 +21,12 @@ $(function () {
   QiscusSDK.core.init({
     AppId: window.SDK_APP_ID,
     mode: 'wide',
+    templateFunction: function () { return '' },
     options: {
+      avatar: false,
       // When we're success login into qiscus SDK we'll have a 1-on-1 chat to guest2@qiscus.com
       // You can change this to any user you have on your AppId, e.g: contact@your_company.com, etc
-      loginSuccessCallback: function () {
+      loginSuccessCallback: function (response) {
         // QiscusSDK.core.UI.chatTarget('guest2@qiscus.com')
         // load Room List
         loadRoomList();

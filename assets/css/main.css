@@ -241,7 +241,7 @@ body:before {
 
 
 /* QISCUS CUSTOMIZED */
-
+/*
 .qcw-app--wide-mode {
   position: absolute !important;
   top: 0;
@@ -372,6 +372,7 @@ body:before {
   top: 6px;
   position: relative;
 }
+*/
 
 
 /* Chat user modal */
