@@ -6,6 +6,9 @@ $(function () {
   var $createGroupNameSidebar = $('.app-sidebar.create-group-name');
   var $contactListSidebar = $('.app-sidebar.contact-list');
   var $chatStrangerSidebar = $('.app-sidebar.chat-stranger');
+  var $addParticipantForm = $('.add-participant-form');
+
+  $addParticipantForm.hide();
 
   var isLoggedIn = window.sessionStorage.getItem('sdk-sample-app---is-loggedin');
   var userData = null;
@@ -36,6 +39,9 @@ $(function () {
 
         // Display UI in sidebar
         renderSidebarHeader();
+
+        // attach event listeners;
+        attachRoomInfoListener();
       },
       newMessagesCallback: function (messages) {
         loadRoomList();
@@ -69,7 +75,14 @@ $(function () {
         $chatStrangerSidebar.addClass('hidden');
         $chatStrangerSidebar.find('input[type="text"]').val('');
         $('#empty-chat-wrapper').addClass('hidden');
-      }
+      },
+      headerClickedCallback: function(data) {
+        if(QiscusSDK.core.selected.room_type != 'group') return false;
+        // display the room info modal
+        $('#room-info').slideToggle('fast');
+        // load room participants to the list
+        renderParticipantList();
+      },
     }
   });
   // login to qiscus
@@ -130,6 +143,55 @@ $(function () {
         })
   }
 
+  function renderParticipantList() {
+    const members = QiscusSDK.core.selected.participants;
+    let $members = '';
+    members.forEach(member => {
+      $members +=
+        `<li>
+          <img src="${member.avatar_url}" />
+          <div>
+            ${member.username}
+            <small>${member.email}</small>
+          </div>
+          <button data-email="${member.email}">&times;</button>
+        </li>`;
+    })
+    $('#room-info ul').empty().append($members);
+  }
+
+  function attachRoomInfoListener() {
+    // add participant
+    $('.sdk-wrapper').on('click', '.add-participant-btn', function(){
+      $('.add-participant-form').slideToggle('fast');
+    });
+    // remove participant
+    $('.sdk-wrapper').on('click', '#room-info li button', function(){
+      // remove this participant
+      QiscusSDK.core
+        .removeParticipantsFromGroup(QiscusSDK.core.selected.id, [$(this).data('email')])
+        .then(() => {
+          renderParticipantList()
+        }, err => {
+          console.log(err);
+          alert('Failed adding participant');
+        });
+    });
+    // formlistener
+    $('.sdk-wrapper').on('submit', 'form.add-participant-form', function(e){
+      e.preventDefault();
+      QiscusSDK.core
+        .addParticipantsToGroup(QiscusSDK.core.selected.id, [$('#add-participant-txt').val()])
+        .then(() => {
+          alert('Successfully Adding Participant');
+          renderParticipantList()
+        }, err => {
+          console.log(err);
+          alert('Failed adding participant');
+        });
+    })
+  }
+
   function renderSidebarHeader() {
     $('.app-sidebar__header img').attr('src', QiscusSDK.core.userData.avatar_url);
     $('.app-sidebar__myinfo div').html(QiscusSDK.core.userData.username);
@@ -149,6 +211,7 @@ $(function () {
       // }
       QiscusSDK.core.UI.chatGroup($this.data('id'));
       $('#empty-chat-wrapper').addClass('hidden');
+      $('#room-info').hide('fast');
       var roomId = $this.attr('data-id');
       clearUnreadMessages(roomId);
     })
@@ -303,6 +366,7 @@ $(function () {
     var target = $(this).data('user-email');
     QiscusSDK.core.UI.chatTarget(target);
     $('#empty-chat-wrapper').addClass('hidden');
+    $('#room-info').hide('fast');
   });
 
   // Load contact
