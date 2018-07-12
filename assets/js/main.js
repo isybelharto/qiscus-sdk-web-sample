@@ -382,6 +382,20 @@ $(function () {
           });
       var contactDOM = contacts.map(createContactDOM);
       $('ul.contact-list').empty().append(contactDOM);
+      // we need to list this contact for adding participant autocomplete also
+      const autocompleteData = [];
+      contacts.forEach(contact => {
+        autocompleteData.push({
+          data: contact.username,
+          value: contact.email
+        });
+      })
+      $('#add-participant-txt').autocomplete({
+        lookup: autocompleteData,
+        onSelect: function (suggestion) {
+          console.log('You selected: ' + suggestion.value + ', ' + suggestion.data);
+        }
+      });
     }).fail(function (error) {
       console.error('error when fetching contact list', error);
     })
