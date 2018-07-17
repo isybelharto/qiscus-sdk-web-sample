@@ -184,6 +184,7 @@ $(function () {
         .addParticipantsToGroup(QiscusSDK.core.selected.id, [$('#add-participant-txt').val()])
         .then(() => {
           alert('Successfully Adding Participant');
+          $('#add-participant-txt').val('');
           renderParticipantList()
         }, err => {
           console.log(err);
