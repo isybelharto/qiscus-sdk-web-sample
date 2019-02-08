@@ -9,12 +9,11 @@ jQuery(function () {
     var userId = event.target['userId'].value;
     var secret = event.target['password'].value;
     var displayName = event.target['displayName'].value || userId;
-    var userAvatar = getAvatarURL(userId);
     QiscusSDK.core.init({
       AppId: window.SDK_APP_ID,
       options: {
         loginSuccessCallback: function (data) {
-          console.log('loginSuccessCallback', data);
+          console.log('loginSuccessCallback', data.user);
           // Warning!!
           // Here we store user email (userId) and secret into sessionStorage
           // please note not to store user secret data into browser
@@ -26,10 +25,10 @@ jQuery(function () {
           // and secret in order to login into QiscusSDK instance on the main
           // application interface.
           var userData = {
-            userId: userId,
+            userId: data.user.email,
             secret: secret,
-            username: displayName,
-            avatarURL: userAvatar
+            username: data.user.username,
+            avatarURL: data.user.avatar_url
           };
           window.sessionStorage.setItem('sdk-sample-app---is-loggedin', true);
           window.sessionStorage.setItem('sdk-sample-app---user-data', JSON.stringify(userData));
@@ -38,16 +37,10 @@ jQuery(function () {
       }
     });
 
-    function getAvatarURL(userId) {
-      var userIdHash = md5(userId);
-      return 'https://www.gravatar.com/avatar/' + userIdHash + '?d=retro';
-    }
-
     QiscusSDK.core.setUser(
         /* userId */ userId,
         /* password */ secret,
-        /* displayName */ displayName,
-        /* avatarURL */ userAvatar
+        /* displayName */ displayName
     );
   });
 });
